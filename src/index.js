@@ -41,6 +41,7 @@ export function useRanger({
   stepSize,
 }) {
   const [activeHandleIndex, setActiveHandleIndex] = React.useState(null)
+  const [focusedHandleIndex, setFocusedHandleIndex] = React.useState(null)
   const [tempValues, setTempValues] = React.useState()
 
   const getLatest = useGetLatest({
@@ -262,6 +263,7 @@ export function useRanger({
       (tempValues || values).map((value, i) => ({
         value,
         active: i === activeHandleIndex,
+        focused: i === focusedHandleIndex,
         getHandleProps: ({
           key = i,
           ref,
@@ -269,6 +271,8 @@ export function useRanger({
           onKeyDown,
           onMouseDown,
           onTouchStart,
+          onFocus,
+          onBlur,
           style = {},
           ...rest
         } = {}) => ({
@@ -288,6 +292,14 @@ export function useRanger({
             handlePress(e, i)
             if (onTouchStart) onTouchStart(e)
           },
+          onFocus: e => {
+            setFocusedHandleIndex(i);
+            if (onFocus) onFocus(e)
+          },
+          onBlur: e => {
+            setFocusedHandleIndex(null)
+            if (onBlur) onBlur(e)
+          },
           role: 'slider',
           'aria-valuemin': min,
           'aria-valuemax': max,
@@ -304,6 +316,7 @@ export function useRanger({
         }),
       })),
     [
+      focusedHandleIndex,
       activeHandleIndex,
       getPercentageForValue,
       handleKeyDown,
